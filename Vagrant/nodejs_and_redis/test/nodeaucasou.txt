@@ -1,0 +1,121 @@
+- name: Import Remi GPG key
+     rpm_key: key="{{ item }}" state=present
+     with_items:
+       - "http://rpms.famillecollet.com/RPM-GPG-KEY-remi"
+   - name: Install Remi repo.
+     command: "rpm -Uvh --force {{ item.href }} creates={{ item.creates }}"
+     with_items:
+       - href: "http://rpms.famillecollet.com/enterprise/remi-release-6.rpm"
+         creates: "/etc/yum.repos.d/remi.repo"
+ 
+   - name: Install epel repo
+    yum: name=epel-release state=present
+ 
+   - name: Stop the firewall
+     service: name=iptables state=stopped
+ 
+   - name: Install NodeJS and npm
+     yum: name=npm state=present enablerepo=epel
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+- name: "Add nodejs apt key"
+  apt_key:
+    url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+    state: present
+
+- name: "Add nodejs 13.x ppa for apt repo"
+  apt_repository:
+    repo: deb https://deb.nodesource.com/node_13.x bionic main
+    update_cache: yes
+
+- name: "Install nodejs"
+  apt:
+    update_cache: yes
+    name: nodejs
+    state: present
+
+- name: "Install NPM-distributed command-line tools"
+  npm:
+    global: yes
+    name: "{{ item }}"
+  with_items:
+    - firebase-tools
+
+
+
+
+
+
+
+
+
+
+
+
+- name: "Add nodejs apt key"
+  apt_key:
+    url: https://rpm.nodesource.com/pub/el/NODESOURCE-GPG-SIGNING-KEY-EL
+    state: present
+
+- name: install node 
+  Shell: |
+    curl -fsSL https://rpm.nodesource.com/setup_16.x | sudo bash -
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+- name: Install Remi repo.
+      yum:
+        name: "https://rpms.remirepo.net/enterprise/remi-release-7.rpm"
+        state: present
+    - name: Import Remi GPG key.
+      rpm_key:
+        key: "https://rpms.remirepo.net/RPM-GPG-KEY-remi"
+        state: present
+    - name: Install EPEL repo.
+      yum:
+        name: epel-release
+        state: present
+
+
+- name: Ensure firewalld is stopped (since this is a test server).
+      service:
+        name: firewalld
+        state: stopped
+    - name: Install Node.js and npm.
+      yum:
+        name: npm
+        state: present
+        enablerepo: epel
+    - name: Install Forever (to run our Node.js app).
+      npm:
+        name: forever
+        global: yes
+        state: present
+

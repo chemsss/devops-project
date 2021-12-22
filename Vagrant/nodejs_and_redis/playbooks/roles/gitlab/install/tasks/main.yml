@@ -1,0 +1,80 @@
+---
+- name: Install required packages
+  yum:
+    name:
+      - curl
+      - policycoreutils-python
+      - openssh-server
+    state: latest
+
+- name: Enable and start sshd
+  service:
+    name: sshd
+    state: started
+    enabled: yes
+
+- name: Enable HTTP+HTTPS access
+  firewalld:
+    # This is how we use a variable
+    service: "{{ item }}"
+    permanent: yes
+    state: enabled
+  # The module will be run for each item
+  with_items:
+    - http
+    - https
+
+- name: Reload firewalld
+  service:
+    name: firewalld
+    state: reloaded
+
+- name: Install postfix
+  yum:
+    name: postfix
+    state: latest
+
+- name: Enable and start postfix
+  service:
+    name: postfix
+    state: started
+    enabled: yes
+
+
+- name: Download redis.rpm file
+  get_url:
+    url: https://rpmfind.net/linux/remi/enterprise/7/remi/x86_64/redis-6.0.15-1.el7.remi.x86_64.rpm
+    dest: /home
+    mode: '0644'
+
+
+
+
+- name: Install Remi repo.
+      yum:
+        name: "https://rpms.remirepo.net/enterprise/remi-release-7.rpm"
+        state: present
+    - name: Import Remi GPG key.
+      rpm_key:
+        key: "https://rpms.remirepo.net/RPM-GPG-KEY-remi"
+        state: present
+    - name: Install EPEL repo.
+      yum:
+        name: epel-release
+        state: present
+
+
+- name: Ensure firewalld is stopped (since this is a test server).
+      service:
+        name: firewalld
+        state: stopped
+    - name: Install Node.js and npm.
+      yum:
+        name: npm
+        state: present
+        enablerepo: epel
+    - name: Install Forever (to run our Node.js app).
+      npm:
+        name: forever
+        global: yes
+        state: present

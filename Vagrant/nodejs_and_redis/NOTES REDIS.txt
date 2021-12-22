@@ -1,0 +1,12 @@
+- name: install redis
+    yum:
+    name: /home/redis-6.0.15-1.el7.remi.x86_64.rpm
+    state: present
+
+- name: Redis.conf backup 
+      command: mv /etc/redis.conf /etc/redis_backup.conf
+
+- name: Start redis service
+       service:
+         name: redis
+         state: started
