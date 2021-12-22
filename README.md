@@ -15,13 +15,10 @@ In this repository is explained how to set up :
 * Monitoring with Prometheus and Grafano to the application containerized in a K8s cluster
   
   
-  
-  
-  
-  
+
 # 1. Web application
 
-The app is a basic NodeJS web application exposing REST API that creates and stores user parameters in [Redis database](https://redis.io/).
+The app is a basic NodeJS web application exposing REST API that creates and stores user parameters in a [Redis database](https://redis.io/).
 
 ## Functionality
 
@@ -31,7 +28,7 @@ The app is a basic NodeJS web application exposing REST API that creates and sto
 
 ## Installation
 
-This application is written on NodeJS and it uses Redis database.
+This application is written on NodeJS and it uses a Redis database.
 
 1. [Install NodeJS](https://nodejs.org/en/download/)
 
@@ -49,10 +46,10 @@ npm install
 
 1. Start a web server
 
-From the root directory of the project run:
+From the /userapi directory of the project run:
 
 ```
-npm start
+npm run start
 ```
 
 It will start a web server available in your browser at http://localhost:3000.
@@ -81,12 +78,20 @@ Another way to test your REST API is to use [Postman](https://www.postman.com/).
 From the root directory of the project, run:
 
 ```
-npm test
+npm run test
 ```
 
 
 
+# 2. CI/CD pipeline with GitHub Actions and Heroku
 
+* The continuous integration workflow has been setup with GitHub Actions. 
+The workflow automates building and tests of our NodeJS project. Before every deployment we check if the workflow tests have passed successfully to make sure the code runs fine. 
+
+* The continuous deployment is done with Heroku. 
+
+To create the workflow we went into the "Actions" tab of our project and created the workflow from the yaml template provided by GitHub.
+![image](https://user-images.githubusercontent.com/61418782/147162931-0b970768-e4eb-456a-895a-647fc00f439f.png)
 
 
 #DOCKER 
