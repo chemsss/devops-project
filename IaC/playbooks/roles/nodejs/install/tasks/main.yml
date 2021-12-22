@@ -54,9 +54,9 @@
     url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
     state: present
 
-- name: "Add nodejs 13.x ppa for apt repo"
+- name: "Add nodejs 16.x ppa for apt repo"
   apt_repository:
-    repo: deb https://deb.nodesource.com/node_13.x bionic main
+    repo: deb https://deb.nodesource.com/node_16.x bionic main
     update_cache: yes
 
 - name: "Install nodejs"
