@@ -7,7 +7,7 @@
     "start": "node src/index.js",
     "test": "mocha test/*.js"
   },
-  "author": "Sergei Kudinov",
+  "author": "",
   "license": "",
   "dependencies": {
     "express": "^4.17.1",
