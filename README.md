@@ -77,8 +77,11 @@ From the root directory of the project, run:
 
 ```
 npm run test
-```
-
+```  
+  
+It should pass the 12 tests:  
+  
+![image](https://user-images.githubusercontent.com/61418782/147202857-0b48c4b8-7fd7-4aa8-935e-f41acf705150.png)
 
 
 # 2. CI/CD pipeline with GitHub Actions and Heroku
