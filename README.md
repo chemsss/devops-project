@@ -2,7 +2,7 @@
   
 # Web application - DevOps Project
 
-Welcome to the repository of our web application DevOps project. The goal of this project is to implement to a simple API web application that uses storages in a Redis database softwares that cover the whole DevOps cycle. The softwares help us automate the building, testing, deployment and running of our project.
+Welcome to the repository of our web application DevOps project. The goal of this project is to implement softwares covering the whole DevOps cycle to a simple API web application that uses storages in a Redis database. The softwares help us automate the building, testing, deployment and running of our project.
 
 In this repository is explained how to set up : 
 * The User API web application
@@ -184,7 +184,7 @@ For this, in addition to installing Vagrant, you have to make sure you have inst
 2. [Install Vagrant](https://www.vagrantup.com/downloads.html)  
   
 
-## Creating the virtual machine (VM)  
+## Creating and provisionning the virtual machine (VM)  
 
 * Go to the [/IaC](https://github.com/chemsss/devops-project/tree/main/IaC) directory (where there is the [Vagrantfile](https://github.com/chemsss/devops-project/blob/main/IaC/Vagrantfile)) and run in the terminal:
 
@@ -301,8 +301,91 @@ docker-compose rm
 
 # 5. Docker orchestration using Kubernetes 
 
+Kubernetes is an open-source system for automating the deployment, scaling and management of containerized applications. Compared to Kubernetes, Docker Compose has limited functionnality.  
+  
+
+## Install Minikube
+Minikube is a tool that makes it easy tu run Kubernetes locally. 
+  
+[Install Minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/) following the instructions depending on your OS.  
+
+* Start Minikube: 
+```bash
+minikube start
+```   
+
+* Check that everything is OK:
+```bash
+minikube status
+```  
+
+## Running the Kubernetes deployments
+
+* Go to the [/k8s](https://github.com/chemsss/devops-project/tree/main/k8s) directory and run this command for every file:
+```bash
+kubectl apply -f <file_name.yaml>
+```  
+* The deployment.yaml file describes the desired states of the redis and userapi deployments.  
+* The service.yaml file exposes the redis and userapi apps as network services and * gives them the right ports.
+* The persistentvolume.yaml file creates a piece of storage in the cluster which has a lifecycle independent of any individual Pod that uses the PersistentVolume.
+* The persistentvolumeclaim.yaml file create a request for storage by a user.  
+  
+## Check that everything is running 
+* Check that the deployments are running:
+```bash
+kubectl get deployments
+```  
+The result should be as following:  
+![image](https://user-images.githubusercontent.com/61418782/147182096-6c5e4f86-72a7-4062-9323-3893180c6db7.png)  
+
+* Check that the services are running:
+```bash
+kubectl get services
+```
+Should output the following:
+![image](https://user-images.githubusercontent.com/61418782/147182248-561421d0-020a-40ad-8d07-1e9589da29fd.png)  
+  
+* Check that the PersistentVolume is running:
+```bash
+kubectl get pv
+```
+Outputs the following:
+![image](https://user-images.githubusercontent.com/61418782/147182440-566d5b12-591d-45ae-9f51-0a21d39ce965.png)  
+  
+* Check that the PersistentVolumeClaim is running:
+```bash
+kubectl get pvc
+```
+Outputs the following:
+![image](https://user-images.githubusercontent.com/61418782/147182537-ece8b5ed-d51c-4335-b89d-299ea912583c.png)    
+    
+We can see in the outputs that the PersistentVolumeClaim is bound to the PersistentVolume. The claim requests at least 3Gi from our hostPath PersistentVolume.
 
 
 
+## Accessing the containerized app
+
+* Run the following command to the userapi service:
+```bash
+ kubectl port-forward service/userapi-deployment 3000:3000
+```  
+  
+The home page of our app should display when going to http://localhost:3000/ on your browser.
+
+* Run the following command:
+```bash
+kubectl get pods
+```  
+Outputs the following:
+  
+![image](https://user-images.githubusercontent.com/61418782/147184947-bfedbd4a-1e16-4a56-95d0-441fd79f991c.png)  
+  
+* You can send a bash command to one of the 3 pod replicas created with the userapi deployment with the following command:
+```bash
+ kubectl exec <POD_NAME> -- <COMMAND>
+ #or
+ kubectl exec -it <POD_NAME> -- <COMMAND>
+```  
+  
 
 
