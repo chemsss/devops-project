@@ -336,6 +336,7 @@ kubectl apply -f <file_name.yaml>
 kubectl get deployments
 ```  
 The result should be as following:  
+  
 ![image](https://user-images.githubusercontent.com/61418782/147182096-6c5e4f86-72a7-4062-9323-3893180c6db7.png)  
 
 * Check that the services are running:
@@ -343,6 +344,7 @@ The result should be as following:
 kubectl get services
 ```
 Should output the following:
+  
 ![image](https://user-images.githubusercontent.com/61418782/147182248-561421d0-020a-40ad-8d07-1e9589da29fd.png)  
   
 * Check that the PersistentVolume is running:
@@ -350,16 +352,26 @@ Should output the following:
 kubectl get pv
 ```
 Outputs the following:
+  
 ![image](https://user-images.githubusercontent.com/61418782/147182440-566d5b12-591d-45ae-9f51-0a21d39ce965.png)  
   
 * Check that the PersistentVolumeClaim is running:
 ```bash
 kubectl get pvc
 ```
-Outputs the following:
+Outputs the following:  
+  
 ![image](https://user-images.githubusercontent.com/61418782/147182537-ece8b5ed-d51c-4335-b89d-299ea912583c.png)    
     
-We can see in the outputs that the PersistentVolumeClaim is bound to the PersistentVolume. The claim requests at least 3Gi from our hostPath PersistentVolume.
+We can see in the outputs that the PersistentVolumeClaim is bound to the PersistentVolume. The claim requests at least 3Gi from our hostPath PersistentVolume.  
+  
+
+* You can also check that everything is running through the minikube dashboard:  
+```bash
+minikube dashboard
+```  
+  
+![image](https://user-images.githubusercontent.com/61418782/147188835-41bea159-c928-4b9a-a724-cccbb7f96d08.png)
 
 
 
@@ -377,7 +389,7 @@ The home page of our app should display when going to http://localhost:3000/ on 
 kubectl get pods
 ```  
 Outputs the following:
-  
+   
 ![image](https://user-images.githubusercontent.com/61418782/147184947-bfedbd4a-1e16-4a56-95d0-441fd79f991c.png)  
   
 * You can send a bash command to one of the 3 pod replicas created with the userapi deployment with the following command:
