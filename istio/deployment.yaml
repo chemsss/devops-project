@@ -1,0 +1,109 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-master
+  labels:
+    app: redis
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: redis
+	version: v1
+    spec:
+      containers:
+      - name: redis
+        image: redis
+        ports:
+          - containerPort: 6379
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-master
+  labels:
+    app: redis
+    version: v2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: redis
+	version: v2
+    spec:
+      containers:
+      - name: redis
+        image: redis
+        ports:
+          - containerPort: 6379
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: userapi-deployment
+  labels:
+    app: userapi
+    version: v1
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: userapi
+      version: v1 
+  template:
+    metadata:
+      labels:
+        app: userapi
+	version: v1
+    spec:
+      containers:
+      - name: userapi
+        image: chemss/userapi
+        ports:
+          - containerPort: 3000
+        env:
+          - name: REDIS_HOST
+            value: redis-master
+          - name: REDIS_PORT
+            value: "6379"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: userapi-deployment
+  labels:
+    app: userapi
+    version: v2
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: userapi
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: userapi
+	version: v2
+    spec:
+      containers:
+      - name: userapi
+        image: chemss/userapi
+        ports:
+          - containerPort: 3000
+        env:
+          - name: REDIS_HOST
+            value: redis-master
+          - name: REDIS_PORT
+            value: "6379"

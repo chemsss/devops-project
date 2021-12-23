@@ -401,3 +401,151 @@ Outputs the following:
   
 
 
+
+# 5. Making a service mesh using Istio
+
+Istio is a service mesh that can control the traffic flow between micro-services.  
+For example, it can be used to redirect a parts of the users into different versions of a service.  
+  
+## Installation  
+  
+* Make sure you have Minikube installed and run:
+```bash
+minikube config set vm-driver virtualbox (or vmware, or kvm2) 
+#or minikube config set vm-driver virtualbox
+minikube start --memory=16384 --cpus=4 --kubernetes-version=v1.18.0 
+#configure the RAM and CPU usage according to your system
+```    
+  
+Intructions: https://istio.io/docs/setup/getting-started/  
+  
+Follow the installation instructions until the [Deploy the sample application](https://istio.io/latest/docs/setup/getting-started/#bookinfo) section.  
+
+
+## Yaml Deployment files
+
+With Istio, we are going to try to route requests between 2 different version of our app. So, in the [istio](https://github.com/chemsss/devops-project/tree/main/istio) folder, we have changed the deployment.yaml file and copy pasted the userapi et redis deployments, so now we have 4 deployments. However, the first userapi et redis deployments are linked to the version "v1" and the 2 others to version "v2".
+
+* Run the following command in the [/istio](https://github.com/chemsss/devops-project/tree/main/istio) directory for each file in the folder:  
+```bash
+kubectl apply -f <file_name.yaml>
+```   
+  
+
+## Routing  
+  
+
+* Default routing
+  
+By applying virtual services, we can set the default version the microservices that we want. In the [virtual-service-v1-v2.yaml](https://github.com/chemsss/devops-project/tree/main/istio/virtual-service-v1-v2.yaml) file, we have set the version v1 for redis and for userapi as the default version:  
+  
+```yaml
+apiVersion: networking.istio.io/v1alpha3
+kind: Service
+metadata:
+  name: redis-service
+spec:
+  hosts:
+  - redis-service
+  http:
+  - route:
+    - destination:
+        host: redis-service
+        subset: v1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: userapi-service
+spec:
+  hosts:
+  - userapi-service
+  http:
+  - route:
+    - destination:
+        host: userapi-service
+        subset: v1
+```  
+  
+
+* User identity based routing  
+  
+With the [virtual-service-user-routing.yaml](https://github.com/chemsss/devops-project/tree/main/istio/virtual-service-v1-v2.yaml) file, we applied a virtual service to have a user based routing.   
+  
+```yaml
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: userapi-service
+spec:
+  hosts:
+    - userapi-service
+  http:
+  - match:
+    - headers:
+        username:
+          exact: chems
+    route:
+    - destination:
+        host: userapi-service
+        subset: v1
+  - route:
+    - destination:
+        host: userapi-service
+        subset: v2
+```  
+  
+For our service userapi-service, all the connections that are sending an HTTP request with the username equal "chems" in its header will be sent to userapi-service:v2.
+  
+
+
+## Traffic shifting  
+  
+Traffic shifting is usually used to migrate traffic gradually from an older version of a microservice to a new one. You can send a part of the whole traffic to be sent to the version of the micro-services of your choice.  
+  
+The [virtual-service-traffic-shifting.yaml](https://github.com/chemsss/devops-project/tree/main/istio/virtual-service-v1-v2.yaml) file applies a virtual service that redirect 50% of traffic into the v1 of the userapi deployment and the other 50% into the v2 of userapi:  
+  
+```yaml
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: userapi-service
+spec:
+  hosts:
+    - userapi-service
+  http:
+  - route:
+    - destination:
+        host: userapi-service
+        subset: 2
+      weight: 50
+    - destination:
+        host: userapi-service
+        subset: v1
+      weight: 50
+```  
+  
+
+
+
+# 6. Monitoring containerized application with Prometheus and Grafana  
+
+Isitio being a service mesh that identifies the amount of traffic comming into micro-services, it gives also the possibility to monitorize our containerized application thanks to its many addons and packages that can be installed.  
+  
+## Installation  
+  
+Follow the same [installation guide](https://istio.io/docs/setup/getting-started/ ) than in the last part but stop at the [View the dashboard](https://istio.io/latest/docs/setup/getting-started/#dashboard) part. 
+
+
+## Prometheus  
+  
+Follow intructions for the installation of Prometheus: https://istio.io/latest/docs/ops/integrations/prometheus/   
+
+  Prometheus is installed through Istio thanks to addons. Prometheus works by scrapping the data emitted by the Istio service mesh to be able to generate its dashboard. To make it work, you must customize Promeheus' scrapping configurations. Scrapping configurations are provided in the above guide for to scrape Istio's http-monitoring port and Envoy stats. TLS Settings are also provided to scrape using Istio certificates.
+
+
+## Grafana  
+  
+Follow intructions for the installation of Grafana: https://istio.io/latest/docs/ops/integrations/grafana/  
+  
+Grafana is also installed through Istio's addons. To create it dashboard, Grafana can import Istio's dashboard through a script that is provided in the above guide. Grafana can be also installed and configured through other methods. There is documentation in the guide to import Istio dashboards with other intallation methods of Grafana.
