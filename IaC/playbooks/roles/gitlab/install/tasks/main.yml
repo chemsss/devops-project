@@ -40,35 +40,16 @@
     state: started
     enabled: yes
 
-
-- name: Download redis.rpm file
+- name: Download GitLab install script
   get_url:
-    url: https://rpmfind.net/linux/remi/enterprise/7/remi/x86_64/redis-6.0.15-1.el7.remi.x86_64.rpm
-    dest: /home
-    mode: '0644'
+    url: https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.rpm.sh
+    dest: /tmp/script.rpm.sh
 
+- name: Execute GitLab install script
+  script: /tmp/script.rpm.sh
 
-
-- name: "Add nodejs apt key"
-  apt_key:
-    url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
-    state: present
-
-- name: "Add nodejs 13.x ppa for apt repo"
-  apt_repository:
-    repo: deb https://deb.nodesource.com/node_13.x bionic main
-    update_cache: yes
-
-- name: "Install nodejs"
-  apt:
-    update_cache: yes
-    name: nodejs
-    state: present
-
-- name: "Install NPM-distributed command-line tools"
-  npm:
-    global: yes
-    name: "{{ item }}"
-  with_items:
-    - firebase-tools
-
+- name: Install GitLab
+  yum:
+    name: gitlab-ee
+  environment:
+    EXTERNAL_URL: http://gitlab.local
